@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Build e cobertura
+dist/
+coverage/
+
+# Variaveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Logs e arquivos do sistema/editor
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# Arquivos locais do Prisma
+prisma/*.db
+prisma/*.db-journal
