@@ -17,5 +17,5 @@ coverage/
 .vscode/
 
 # Arquivos locais do Prisma
-prisma/*.db
-prisma/*.db-journal
+backend/prisma/*.db
+backend/prisma/*.db-journal

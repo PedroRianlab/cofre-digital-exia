@@ -1,5 +1,11 @@
 # Guia de Contribuição para o Cofre de Notas.
 
+## 📁 Estrutura de Pastas
+
+- `backend/`: API NestJS, schema e migrations do Prisma e testes do backend.
+- `frontend/`: aplicação web (pasta reservada nesta etapa).
+- Raiz: documentação, regras do projeto e `docker-compose.yml` do PostgreSQL.
+
 ## 📂 Estrutura do Repositório
 
 - main: versão estável em produção.

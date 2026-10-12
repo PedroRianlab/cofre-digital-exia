@@ -6,9 +6,9 @@ Sou estagiário construindo um back-end. Quero ENTENDER o código, não só rece
 Regras de trabalho:
 
 - Faça UMA etapa por vez, somente a que eu pedir. Não adiante etapas nem
-  adicione funcionalidades extras.
+  adicione funcionalidades extras (Após tudo, irei revisar passo a passo, caso tenha dúvidas sobre algum conceito, irei perguntar, se isso ocorrer explique de forma simples e objetiva).
 - Ao final de cada etapa, explique em até 5 linhas o que cada arquivo novo faz
-  e por que existe, e diga como testar.
+  e por que existe, e diga como testar (se isso for muito complexo explique em até 10 linhas).
 - Prefira código simples e legível, com comentários curtos. Nada de
   abstrações desnecessárias.
 - Nunca coloque segredos no código; tudo vai em variáveis de ambiente.
@@ -32,7 +32,7 @@ GitHub, rodando em ambiente local (não precisa de deploy).
 - Auth: JWT + Guard; senha com hash (bcrypt ou argon2)
 - Abuso: @nestjs/throttler + Helmet
 - Frontend: React/Next + Axios, com estados de loading e mensagens de erro
-- Segredos: .env no .gitignore + .env.example
+- Segredos: backend/.env no .gitignore + backend/.env.example
 
 ## Arquitetura
 
@@ -71,8 +71,9 @@ log de auditoria, compartilhamento temporário, deploy, recuperação de senha.
 
 ## Etapa atual
 
-Etapa 1: crie o esqueleto do backend (Nest + Prisma + Postgres via
-docker-compose + .env/.env.example/.gitignore), módulos auth, users e notes
-com as camadas vazias, e o schema Prisma com User (id, email único, senhaHash,
-datas) e Note (id, titulo, conteudo, userId, datas). Gere a migration.
+Etapa 1: crie o esqueleto em backend/ (Nest + Prisma + Postgres via
+docker-compose.yml na raiz + backend/.env/backend/.env.example e .gitignore na
+raiz), módulos auth, users e notes com as camadas vazias, e o schema Prisma em
+backend/prisma/schema.prisma com User (id, email único, senhaHash, datas) e Note
+(id, titulo, conteudo, userId, datas). Gere a migration.
 NÃO implemente login nem CRUD ainda. Ao final, Executarei e revisarei cada etapa
