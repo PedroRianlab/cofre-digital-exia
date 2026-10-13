@@ -9,6 +9,8 @@ const environmentSchema = z
     LOGIN_THROTTLE_LIMIT: z.coerce.number().int().positive().default(5),
     REGISTER_THROTTLE_LIMIT: z.coerce.number().int().positive().default(10),
     AUTH_THROTTLE_TTL_MS: z.coerce.number().int().positive().default(60_000),
+    GLOBAL_THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
+    GLOBAL_THROTTLE_TTL_MS: z.coerce.number().int().positive().default(60_000),
   })
   .passthrough();
 

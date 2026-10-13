@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   type AuthenticatedRequest,
   JwtAuthGuard,
@@ -29,6 +30,7 @@ import {
 
 @Controller('notes')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle({ login: true, register: true })
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 

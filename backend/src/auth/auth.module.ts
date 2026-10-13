@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   JwtModule,
@@ -6,6 +7,7 @@ import {
   type JwtSignOptions,
 } from '@nestjs/jwt';
 import {
+  ThrottlerGuard,
   ThrottlerModule,
   type ThrottlerModuleOptions,
 } from '@nestjs/throttler';
@@ -24,6 +26,11 @@ import { JwtAuthGuard } from './jwt-auth.guard';
         const ttl = configService.getOrThrow<number>('AUTH_THROTTLE_TTL_MS');
 
         return [
+          {
+            name: 'global',
+            ttl: configService.getOrThrow<number>('GLOBAL_THROTTLE_TTL_MS'),
+            limit: configService.getOrThrow<number>('GLOBAL_THROTTLE_LIMIT'),
+          },
           {
             name: 'login',
             ttl,
@@ -52,7 +59,14 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard],
+  providers: [
+    AuthService,
+    JwtAuthGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
   exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}
