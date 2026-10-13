@@ -27,6 +27,9 @@ Copy-Item .env.example .env
 Edite `backend/.env` e defina uma senha local. O valor de `POSTGRES_PASSWORD`
 deve ser o mesmo usado em `DATABASE_URL`.
 
+`npm.cmd install` é necessário somente na primeira execução, quando as
+dependências forem alteradas ou se a pasta `backend/node_modules` for removida.
+
 ### 2. Subir o banco e preparar o Prisma
 
 ```powershell
@@ -51,6 +54,19 @@ npm.cmd run start:dev
 
 A API roda em `http://localhost:3000`.
 
+### Próximas execuções
+
+Com as dependências já instaladas e o `.env` configurado, use apenas:
+
+```powershell
+# Na raiz do repositório
+docker compose up -d
+
+# Em outro terminal, dentro de backend
+Set-Location backend
+npm.cmd run start:dev
+```
+
 ### 4. Iniciar o frontend
 
 Em outro terminal:
@@ -69,3 +85,23 @@ Com o banco iniciado:
 Set-Location backend
 npm.cmd run test:e2e
 ```
+
+## Segurança do backend
+
+- Senhas são armazenadas com Argon2id.
+- Rotas privadas validam JWT e isolam notas por `id` e `userId`.
+- Zod rejeita campos extras e limita o tamanho dos textos.
+- Helmet adiciona cabeçalhos HTTP de segurança.
+- Login aceita 5 tentativas por IP a cada 60 segundos; cadastro aceita 10.
+
+## Trade-offs do limite de tentativas
+
+O Throttler identifica clientes pelo IP e armazena contadores em memória, opção
+suficiente para este MVP local de instância única. Reiniciar a API limpa os
+contadores. Em múltiplas instâncias seria necessário um armazenamento
+compartilhado, como Redis.
+
+Atrás de proxy ou load balancer, seria necessário configurar `trust proxy` para
+usar o IP real do cliente. O limite atual é por IP, não por conta, então usuários
+na mesma rede podem compartilhar o contador. Se Swagger for adicionado, o CSP
+padrão do Helmet deverá ser revisado para a página `/docs`.

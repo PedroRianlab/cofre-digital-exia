@@ -1,6 +1,9 @@
 # 012 - Filtro global de erros HTTP
 
-**Status:** Aceito
+**Status:** Substituído pelo ADR 014
+
+O ADR 014 amplia esta decisão ao definir também o registro interno dos erros
+500 e a cobertura isolada de todos os status exigidos pelo RNF05.
 
 ## Contexto
 

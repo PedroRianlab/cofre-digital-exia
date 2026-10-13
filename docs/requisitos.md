@@ -45,10 +45,96 @@ Arquivos principais:
 Como foi testado: `backend/test/auth.e2e-spec.ts` verifica a emissão de um JWT
 HS256 e a mensagem única para os dois casos de credenciais inválidas.
 
+### RF03 - Criar nota
+
+**Status:** Implementado
+
+`POST /notes` recebe `titulo` e `conteudo`, associa a nota ao `sub` do JWT e
+retorna HTTP 201. O título aceita até 120 caracteres e o conteúdo até 10.000.
+Campos extras ou valores fora dos limites retornam HTTP 400. O `userId` não é
+aceito no payload nem exposto na resposta.
+
+Como foi testado: `backend/test/notes.e2e-spec.ts` verifica criação, vínculo com
+o usuário autenticado, limites do Zod, rejeição de campo extra e ausência de
+token.
+
+### RF04 - Listar notas
+
+**Status:** Implementado
+
+`GET /notes` filtra pelo `userId` obtido do JWT e ordena as notas por
+`updatedAt` decrescente. A resposta não contém `userId`.
+
+Como foi testado: dois usuários possuem notas, e a listagem de um deles não
+contém a nota do outro.
+
+### RF05 - Visualizar nota
+
+**Status:** Implementado
+
+`GET /notes/:id` busca sempre por `id` e `userId`. Nota inexistente ou de outro
+usuário retorna HTTP 404 com a mesma mensagem. O parâmetro `id` precisa ser um
+UUID válido.
+
+Como foi testado: nota própria retorna HTTP 200, UUID inválido retorna 400 e
+nota inexistente ou alheia retorna 404.
+
+### RF06 - Editar nota
+
+**Status:** Implementado
+
+`PATCH /notes/:id` permite alterar `titulo`, `conteudo` ou ambos. O payload deve
+conter ao menos um campo. A operação usa `updateMany` filtrado por `id` e
+`userId` e verifica `count`; nota inexistente ou alheia retorna HTTP 404.
+
+Como foi testado: atualização parcial preserva o campo não enviado, payload
+vazio ou acima do limite retorna 400 e tentativa sobre nota alheia retorna 404
+sem modificá-la.
+
+### RF07 - Remover nota
+
+**Status:** Implementado
+
+`DELETE /notes/:id` usa `deleteMany` filtrado por `id` e `userId` e verifica
+`count`. A remoção de nota própria retorna HTTP 204 sem body; nota inexistente
+ou alheia retorna HTTP 404.
+
+Como foi testado: tentativa sobre nota alheia não a remove, enquanto a remoção
+da própria nota retorna 204 e ela deixa de ser encontrada.
+
+### RNF05 - Tratamento padronizado de erros
+
+**Status:** Implementado
+
+O `HttpExceptionFilter` devolve `statusCode`, `message`, `path` e `timestamp`
+para erros HTTP 400, 401, 403, 404 e 500. Erros de validação podem incluir
+`fields`. No erro 500, o cliente recebe somente `Erro interno do servidor`,
+enquanto método, rota e stack trace são registrados no log do servidor.
+
+Como foi testado: `backend/test/errors.e2e-spec.ts` usa um módulo Nest exclusivo
+do teste, sem `AppModule` ou banco, para provocar e conferir todos os status. O
+teste também verifica que o detalhe interno não aparece na resposta e chega ao
+logger.
+
+### RNF06 - Limite de tentativas e Helmet
+
+**Status:** Implementado
+
+`POST /auth/login` aceita até 5 tentativas por IP em 60 segundos e
+`POST /auth/register` aceita até 10. Ao exceder o limite, a API retorna HTTP 429
+no formato global de erros. Os limites e a janela são configuráveis por
+variáveis de ambiente. Helmet adiciona cabeçalhos HTTP de segurança globalmente.
+
+Como foi testado: `backend/test/throttling.e2e-spec.ts` usa senha válida no
+formato, confirma cinco respostas 401 e uma sexta resposta 429 no login, testa
+o limite independente do cadastro e verifica cabeçalhos adicionados pelo Helmet.
+
 ## Comportamentos de apoio implementados
 
 - Payloads de cadastro e login usam schemas Zod estritos. Campos extras são
   rejeitados com HTTP 400.
+- Todas as rotas de notas são protegidas pelo `JwtAuthGuard`.
+- Schemas de notas validam bodies e parâmetros de rota com Zod.
 - O filtro global devolve `statusCode`, `message`, `path` e `timestamp`.
 - Erros HTTP 400 podem incluir a lista `fields`.
 - Erros HTTP 500 não expõem a mensagem interna da exceção.
@@ -58,17 +144,7 @@ HS256 e a mensagem única para os dois casos de credenciais inválidas.
 
 | Requisito | Status | Evidência atual |
 | --- | --- | --- |
-| RF03 - Proteger rotas com JWT | Não implementado | O token é emitido, mas não existe Guard ou estratégia JWT. |
-| RF04 - Criar notas | Não implementado | `NotesController`, `NotesService` e `NotesRepository` estão vazios. |
-| RF05 - Listar as próprias notas | Não implementado | Não há endpoint ou consulta de notas. |
-| RF06 - Consultar uma nota própria | Não implementado | Não há busca por `id` e `userId`. |
-| RF07 - Atualizar uma nota própria | Não implementado | Não há endpoint de atualização. |
-| RF08 - Excluir uma nota própria | Não implementado | Não há endpoint de exclusão. |
-| RF09 - Isolar notas entre usuários | Não implementado | Não existe regra de autorização nem teste de isolamento. |
-| RF10 - Interface web | Não implementado | `frontend/` contém apenas `.gitkeep`. |
-
-O schema Prisma já possui `User`, `Note`, relação por `userId`, índice e exclusão
-em cascata. Isso prepara o banco, mas não implementa os requisitos de notas.
+| Interface web | Não implementado | `frontend/` contém apenas `.gitkeep`. |
 
 ## Como executar os testes existentes
 
@@ -79,4 +155,5 @@ Set-Location backend
 npm.cmd run test:e2e
 ```
 
-A suíte atual possui seis casos e usa o banco configurado em `DATABASE_URL`.
+As suítes que usam o banco configurado em `DATABASE_URL` removem somente os
+dados criados durante os próprios testes. A suíte de erros não depende do banco.

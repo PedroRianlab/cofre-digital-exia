@@ -20,12 +20,15 @@ executado em Docker.
 | 009 | Monólito por feature   | Mantém as funcionalidades em módulos de uma única aplicação.      | [ADR 009](adr/009-monolito-por-feature.md)  |
 | 010 | Monorepo               | Mantém backend e espaço do frontend no mesmo repositório.         | [ADR 010](adr/010-monorepo.md)              |
 | 011 | Configuração validada  | Valida as variáveis do JWT durante a inicialização.               | [ADR 011](adr/011-configuracao-validada.md) |
-| 012 | Filtro global de erros | Padroniza respostas de erro e oculta detalhes de falhas internas. | [ADR 012](adr/012-filtro-global-erros.md)   |
+| 012 | Filtro global de erros | Substituído pelo ADR 014. | [ADR 012](adr/012-filtro-global-erros.md)   |
+| 013 | Ocultar notas alheias  | Usa a mesma resposta 404 para notas inexistentes ou de outro usuário. | [ADR 013](adr/013-nao-revelar-notas-alheias.md) |
+| 014 | Formato de erros       | Padroniza respostas e registra internamente as falhas 500. | [ADR 014](adr/014-formato-padronizado-erros.md) |
+| 015 | Limite de tentativas   | Limita login e cadastro por IP usando armazenamento em memória. | [ADR 015](adr/015-limite-tentativas-em-memoria.md) |
 
 ## Limitações conhecidas
 
-A implementação atual cobre a infraestrutura inicial e a autenticação. Os itens
-restantes pertencem às etapas posteriores do MVP descritas em `AGENTS.md`.
+A implementação atual cobre a infraestrutura, autenticação, CRUD isolado de
+notas e proteção básica contra abuso. A interface web ainda não foi feita.
 
 ## Próximos passos
 
