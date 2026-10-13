@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
 import { loginSchema, type LoginInput } from './schemas/login.schema';
@@ -10,12 +18,16 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(ThrottlerGuard)
+  @SkipThrottle({ login: true })
   register(@Body(new ZodValidationPipe(registerSchema)) input: RegisterInput) {
     return this.authService.register(input);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ThrottlerGuard)
+  @SkipThrottle({ register: true })
   login(@Body(new ZodValidationPipe(loginSchema)) input: LoginInput) {
     return this.authService.login(input);
   }

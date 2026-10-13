@@ -5,6 +5,10 @@ import {
   type JwtModuleOptions,
   type JwtSignOptions,
 } from '@nestjs/jwt';
+import {
+  ThrottlerModule,
+  type ThrottlerModuleOptions,
+} from '@nestjs/throttler';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -13,6 +17,26 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 @Module({
   imports: [
     UsersModule,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): ThrottlerModuleOptions => {
+        const ttl = configService.getOrThrow<number>('AUTH_THROTTLE_TTL_MS');
+
+        return [
+          {
+            name: 'login',
+            ttl,
+            limit: configService.getOrThrow<number>('LOGIN_THROTTLE_LIMIT'),
+          },
+          {
+            name: 'register',
+            ttl,
+            limit: configService.getOrThrow<number>('REGISTER_THROTTLE_LIMIT'),
+          },
+        ];
+      },
+    }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

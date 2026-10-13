@@ -1,0 +1,3 @@
+process.env.LOGIN_THROTTLE_LIMIT = '100';
+process.env.REGISTER_THROTTLE_LIMIT = '100';
+process.env.AUTH_THROTTLE_TTL_MS = '60000';
