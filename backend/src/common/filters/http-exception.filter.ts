@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
@@ -14,6 +15,8 @@ type ExceptionBody = {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const request = context.getRequest<Request>();
@@ -26,6 +29,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const exceptionBody = isHttpException ? exception.getResponse() : undefined;
     const details = this.getDetails(exceptionBody);
 
+    if (statusCode === 500) {
+      this.logInternalError(exception, request);
+    }
+
     response.status(statusCode).json({
       statusCode,
       message:
@@ -36,6 +43,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? { fields: details.fields }
         : {}),
     });
+  }
+
+  private logInternalError(exception: unknown, request: Request) {
+    const message = `Erro interno em ${request.method} ${request.url}`;
+
+    if (exception instanceof Error) {
+      this.logger.error(message, exception.stack);
+      return;
+    }
+
+    this.logger.error(message, String(exception));
   }
 
   private getDetails(body: string | object | undefined): ExceptionBody {
