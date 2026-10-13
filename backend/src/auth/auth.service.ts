@@ -10,6 +10,13 @@ import { UsersService } from '../users/users.service';
 import type { LoginInput } from './schemas/login.schema';
 import type { RegisterInput } from './schemas/register.schema';
 
+const ARGON2_OPTIONS = {
+  type: argon2.argon2id,
+  memoryCost: 19_456,
+  timeCost: 2,
+  parallelism: 1,
+} satisfies argon2.HashOptions;
+
 @Injectable()
 export class AuthService implements OnModuleInit {
   private dummyPasswordHash = '';
@@ -21,15 +28,14 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     // Criado uma vez para igualar o trabalho do login quando o e-mail nao existe.
-    this.dummyPasswordHash = await argon2.hash('senha-falsa-para-verificacao', {
-      type: argon2.argon2id,
-    });
+    this.dummyPasswordHash = await argon2.hash(
+      'senha-falsa-para-verificacao',
+      ARGON2_OPTIONS,
+    );
   }
 
   async register(input: RegisterInput) {
-    const senhaHash = await argon2.hash(input.senha, {
-      type: argon2.argon2id,
-    });
+    const senhaHash = await argon2.hash(input.senha, ARGON2_OPTIONS);
     const user = await this.usersService.create(input.email, senhaHash);
 
     if (!user) {

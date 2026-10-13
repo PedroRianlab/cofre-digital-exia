@@ -154,6 +154,13 @@ describe('Auth (e2e)', () => {
     });
 
     expect(savedUser?.senhaHash).toMatch(/^\$argon2id\$/);
+    expect(
+      argon2.needsRehash(savedUser!.senhaHash, {
+        memoryCost: 19_456,
+        timeCost: 2,
+        parallelism: 1,
+      }),
+    ).toBe(false);
     expect(savedUser?.senhaHash).not.toBe(password);
     await expect(argon2.verify(savedUser!.senhaHash, password)).resolves.toBe(
       true,
