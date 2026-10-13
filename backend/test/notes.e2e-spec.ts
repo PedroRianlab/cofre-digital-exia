@@ -16,6 +16,7 @@ type NoteResponse = {
   id: string;
   titulo: string;
   conteudo: string;
+  categoria: string | null;
   createdAt: string;
   updatedAt: string;
   userId?: string;
@@ -35,6 +36,7 @@ describe('Notes (e2e)', () => {
   let userB: TestUser;
   let noteA: NoteResponse;
   let noteB: NoteResponse;
+  let noteWithoutCategoryA: NoteResponse;
 
   const uniquePart = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
   const password = 'Senha-e2e-segura-123';
@@ -140,7 +142,11 @@ describe('Notes (e2e)', () => {
     const response = await request(httpServer)
       .post('/notes')
       .set('Authorization', `Bearer ${userA.accessToken}`)
-      .send({ titulo: 'Nota do usuário A', conteudo: 'Conteúdo original' })
+      .send({
+        titulo: 'Nota do usuário A',
+        conteudo: 'Conteúdo original',
+        categoria: ' Trabalho ',
+      })
       .expect(201);
     const body = response.body as unknown as NoteResponse;
 
@@ -148,6 +154,7 @@ describe('Notes (e2e)', () => {
     expect(noteA).toMatchObject({
       titulo: 'Nota do usuário A',
       conteudo: 'Conteúdo original',
+      categoria: 'Trabalho',
     });
     expect(noteA).not.toHaveProperty('userId');
 
@@ -157,11 +164,28 @@ describe('Notes (e2e)', () => {
     expect(savedNote?.userId).toBe(userA.id);
   });
 
+  it('cria nota sem categoria', async () => {
+    const response = await request(httpServer)
+      .post('/notes')
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .send({ titulo: 'Nota sem categoria', conteudo: 'Conteúdo livre' })
+      .expect(201);
+
+    const body = response.body as unknown as NoteResponse;
+
+    noteWithoutCategoryA = body;
+    expect(noteWithoutCategoryA.categoria).toBeNull();
+  });
+
   it('cria uma nota para o segundo usuário', async () => {
     const response = await request(httpServer)
       .post('/notes')
       .set('Authorization', `Bearer ${userB.accessToken}`)
-      .send({ titulo: 'Nota do usuário B', conteudo: 'Conteúdo privado B' })
+      .send({
+        titulo: 'Nota do usuário B',
+        conteudo: 'Conteúdo privado B',
+        categoria: 'Trabalho',
+      })
       .expect(201);
     const body = response.body as unknown as NoteResponse;
 
@@ -176,8 +200,37 @@ describe('Notes (e2e)', () => {
     const notes = response.body as unknown as NoteResponse[];
 
     expect(notes.some((note) => note.id === noteA.id)).toBe(true);
+    expect(notes.some((note) => note.id === noteWithoutCategoryA.id)).toBe(
+      true,
+    );
     expect(notes.some((note) => note.id === noteB.id)).toBe(false);
     expect(notes.every((note) => !('userId' in note))).toBe(true);
+  });
+
+  it('filtra por categoria mantendo o isolamento por usuário', async () => {
+    const response = await request(httpServer)
+      .get('/notes')
+      .query({ categoria: 'Trabalho' })
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200);
+    const notes = response.body as unknown as NoteResponse[];
+
+    expect(notes.map((note) => note.id)).toEqual([noteA.id]);
+    expect(notes.some((note) => note.id === noteB.id)).toBe(false);
+  });
+
+  it('retorna 400 para categoria longa ou parâmetro desconhecido na query', async () => {
+    await request(httpServer)
+      .get('/notes')
+      .query({ categoria: 'a'.repeat(51) })
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(400);
+
+    await request(httpServer)
+      .get('/notes')
+      .query({ desconhecido: 'valor' })
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(400);
   });
 
   it('RF05 retorna a própria nota', async () => {
@@ -235,6 +288,27 @@ describe('Notes (e2e)', () => {
     expect(body.titulo).toBe('Título atualizado');
     expect(body.conteudo).toBe('Conteúdo original');
     expect(body).not.toHaveProperty('userId');
+  });
+
+  it('edita a categoria da nota própria', async () => {
+    const response = await request(httpServer)
+      .patch(`/notes/${noteA.id}`)
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .send({ categoria: ' Estudos ' })
+      .expect(200);
+    const body = response.body as unknown as NoteResponse;
+
+    expect(body.categoria).toBe('Estudos');
+  });
+
+  it('retorna lista vazia quando a categoria existe somente para o usuário B', async () => {
+    const response = await request(httpServer)
+      .get('/notes')
+      .query({ categoria: 'Trabalho' })
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200);
+
+    expect(response.body).toEqual([]);
   });
 
   it('RF06 retorna 404 ao editar nota de outro usuário', async () => {

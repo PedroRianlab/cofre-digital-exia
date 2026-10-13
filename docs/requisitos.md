@@ -49,8 +49,9 @@ HS256 e a mensagem única para os dois casos de credenciais inválidas.
 
 **Status:** Implementado
 
-`POST /notes` recebe `titulo` e `conteudo`, associa a nota ao `sub` do JWT e
-retorna HTTP 201. O título aceita até 120 caracteres e o conteúdo até 10.000.
+`POST /notes` recebe `titulo`, `conteudo` e a `categoria` opcional, associa a
+nota ao `sub` do JWT e retorna HTTP 201. O título aceita até 120 caracteres, o
+conteúdo até 10.000 e a categoria entre 1 e 50 após remover espaços nas pontas.
 Campos extras ou valores fora dos limites retornam HTTP 400. O `userId` não é
 aceito no payload nem exposto na resposta.
 
@@ -62,11 +63,14 @@ token.
 
 **Status:** Implementado
 
-`GET /notes` filtra pelo `userId` obtido do JWT e ordena as notas por
-`updatedAt` decrescente. A resposta não contém `userId`.
+`GET /notes` filtra sempre pelo `userId` obtido do JWT e aceita o parâmetro
+opcional `categoria`. A listagem mantém a ordenação por `updatedAt` decrescente.
+Parâmetros desconhecidos ou categoria acima de 50 caracteres retornam HTTP 400.
+A resposta contém `categoria`, mas não contém `userId`.
 
-Como foi testado: dois usuários possuem notas, e a listagem de um deles não
-contém a nota do outro.
+Como foi testado: dois usuários possuem notas com a mesma categoria, e o filtro
+retorna somente a nota do usuário autenticado. Uma categoria existente apenas
+para o outro usuário retorna uma lista vazia.
 
 ### RF05 - Visualizar nota
 
@@ -83,13 +87,13 @@ nota inexistente ou alheia retorna 404.
 
 **Status:** Implementado
 
-`PATCH /notes/:id` permite alterar `titulo`, `conteudo` ou ambos. O payload deve
-conter ao menos um campo. A operação usa `updateMany` filtrado por `id` e
+`PATCH /notes/:id` permite alterar `titulo`, `conteudo` ou `categoria`. O payload
+deve conter ao menos um campo. A operação usa `updateMany` filtrado por `id` e
 `userId` e verifica `count`; nota inexistente ou alheia retorna HTTP 404.
 
-Como foi testado: atualização parcial preserva o campo não enviado, payload
-vazio ou acima do limite retorna 400 e tentativa sobre nota alheia retorna 404
-sem modificá-la.
+Como foi testado: atualização parcial, inclusive da categoria, preserva campos
+não enviados; payload vazio ou acima do limite retorna 400 e tentativa sobre
+nota alheia retorna 404 sem modificá-la.
 
 ### RF07 - Remover nota
 

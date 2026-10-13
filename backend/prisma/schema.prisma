@@ -20,6 +20,7 @@ model Note {
   id        String   @id @default(uuid())
   titulo    String
   conteudo  String
+  categoria String?  @db.VarChar(50)
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

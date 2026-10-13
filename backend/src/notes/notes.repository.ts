@@ -7,6 +7,7 @@ const noteSelect = {
   id: true,
   titulo: true,
   conteudo: true,
+  categoria: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -22,9 +23,9 @@ export class NotesRepository {
     });
   }
 
-  findAll(userId: string) {
+  findAll(userId: string, categoria?: string) {
     return this.prisma.note.findMany({
-      where: { userId },
+      where: { userId, ...(categoria !== undefined && { categoria }) },
       orderBy: { updatedAt: 'desc' },
       select: noteSelect,
     });

@@ -11,8 +11,8 @@ export class NotesService {
     return this.notesRepository.create(userId, input);
   }
 
-  findAll(userId: string) {
-    return this.notesRepository.findAll(userId);
+  findAll(userId: string, categoria?: string) {
+    return this.notesRepository.findAll(userId, categoria);
   }
 
   async findOne(id: string, userId: string) {

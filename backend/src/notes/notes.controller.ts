@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +24,10 @@ import {
   type CreateNoteInput,
 } from './schemas/create-note.schema';
 import { noteIdSchema, type NoteIdInput } from './schemas/note-id.schema';
+import {
+  listNotesQuerySchema,
+  type ListNotesQuery,
+} from './schemas/list-notes-query.schema';
 import {
   updateNoteSchema,
   type UpdateNoteInput,
@@ -44,8 +49,11 @@ export class NotesController {
   }
 
   @Get()
-  findAll(@Req() request: AuthenticatedRequest) {
-    return this.notesService.findAll(request.user.sub);
+  findAll(
+    @Req() request: AuthenticatedRequest,
+    @Query(new ZodValidationPipe(listNotesQuerySchema)) query: ListNotesQuery,
+  ) {
+    return this.notesService.findAll(request.user.sub, query.categoria);
   }
 
   @Get(':id')
