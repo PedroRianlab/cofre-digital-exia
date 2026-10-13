@@ -6,6 +6,12 @@ login e gerenciar somente as próprias notas.
 O projeto é um monorepo com frontend em React/Next e backend em NestJS. O
 backend usa PostgreSQL, Prisma, Zod, JWT e Argon2id.
 
+## Documentação
+
+- [Decisões de arquitetura](docs/decisoes.md)
+- [Requisitos](docs/requisitos.md)
+- [Segurança](docs/seguranca.md)
+
 ## Como rodar
 
 ### Pré-requisitos
@@ -93,6 +99,8 @@ npm.cmd run test:e2e
 - Zod rejeita campos extras e limita o tamanho dos textos.
 - Helmet adiciona cabeçalhos HTTP de segurança.
 - Login aceita 5 tentativas por IP a cada 60 segundos; cadastro aceita 10.
+- Rotas autenticadas aceitam 100 requisições por IP a cada 60 segundos.
+- O corpo JSON de cada requisição possui limite de 100 KB.
 
 ## Trade-offs do limite de tentativas
 

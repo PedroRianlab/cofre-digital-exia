@@ -24,6 +24,9 @@ executado em Docker.
 | 013 | Ocultar notas alheias  | Usa a mesma resposta 404 para notas inexistentes ou de outro usuário. | [ADR 013](adr/013-nao-revelar-notas-alheias.md) |
 | 014 | Formato de erros       | Padroniza respostas e registra internamente as falhas 500. | [ADR 014](adr/014-formato-padronizado-erros.md) |
 | 015 | Limite de tentativas   | Limita login e cadastro por IP usando armazenamento em memória. | [ADR 015](adr/015-limite-tentativas-em-memoria.md) |
+| 016 | Finais de linha        | Padroniza arquivos de texto com finais de linha LF. | [ADR 016](adr/016-padronizacao-finais-de-linha.md) |
+| 017 | Custos do Argon2id     | Define explicitamente os custos usados nos hashes de senha. | [ADR 017](adr/017-custos-explicitos-argon2id.md) |
+| 018 | Limites de requisição  | Limita requisições autenticadas e o tamanho do body JSON. | [ADR 018](adr/018-limites-globais-requisicao-body.md) |
 
 ## Limitações conhecidas
 
