@@ -133,6 +133,25 @@ Como foi testado: `backend/test/throttling.e2e-spec.ts` usa senha válida no
 formato, confirma cinco respostas 401 e uma sexta resposta 429 no login, testa
 o limite independente do cadastro e verifica cabeçalhos adicionados pelo Helmet.
 
+### RNF07 - Documentação interativa da API
+
+**Status:** Implementado
+
+`GET /docs` disponibiliza a interface Swagger com cadastro e login públicos e
+as rotas de notas identificadas como protegidas por JWT. Cada operação informa
+o corpo, os limites dos campos, os status esperados e o formato padronizado de
+erro. O botão **Authorize** usa o esquema bearer para enviar o token às rotas de
+notas.
+
+O Swagger fica ativo em todos os ambientes por se tratar de um MVP local. Seus
+modelos servem somente para documentação; a validação real continua nos schemas
+Zod. O CSP padrão do Helmet foi mantido porque a interface abriu com estilos e
+scripts funcionando.
+
+Como foi testado: a página foi aberta no Edge e o fluxo cadastro, login, criação,
+listagem com filtro, consulta, edição e exclusão de nota foi executado contra a
+API. O contrato OpenAPI também foi conferido para autenticação e status HTTP.
+
 ## Comportamentos de apoio implementados
 
 - Payloads de cadastro e login usam schemas Zod estritos. Campos extras são

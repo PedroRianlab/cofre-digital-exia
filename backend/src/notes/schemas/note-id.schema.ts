@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
+// Se este schema mudar, atualize também o modelo correspondente do Swagger.
 export const noteIdSchema = z
   .object({
-    id: z.string().uuid(),
+    id: z.uuid(),
   })
   .strict();
 

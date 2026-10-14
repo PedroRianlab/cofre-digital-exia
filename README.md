@@ -60,6 +60,28 @@ npm.cmd run start:dev
 
 A API roda em `http://localhost:3000`.
 
+### Documentação Swagger
+
+Com o backend em execução, acesse `http://localhost:3000/docs`. A documentação
+fica ativa em todos os ambientes; essa foi uma escolha consciente porque o MVP
+é executado apenas localmente. O Helmet continua ativo e o CSP padrão é
+compatível com a interface atual do Swagger.
+
+Fluxo para testar manualmente:
+
+1. Abra `POST /auth/register`, clique em **Try it out** e cadastre um usuário.
+2. Execute `POST /auth/login` com as mesmas credenciais e copie o `accessToken`.
+3. Clique em **Authorize** e informe somente o token, sem o prefixo `Bearer`.
+4. Teste a criação, listagem, consulta, edição e exclusão em `notes`.
+
+O login aceita 5 tentativas por IP a cada 60 segundos. Se receber HTTP 429,
+aguarde 60 segundos antes de tentar novamente.
+
+Os modelos usados pelo Swagger repetem os limites definidos nos schemas Zod.
+O Zod continua sendo a validação real; ao alterar uma regra, as duas descrições
+precisam ser atualizadas. Uma evolução possível é gerar o OpenAPI a partir dos
+schemas Zod para eliminar essa duplicação.
+
 ### Próximas execuções
 
 Com as dependências já instaladas e o `.env` configurado, use apenas:
@@ -111,5 +133,5 @@ compartilhado, como Redis.
 
 Atrás de proxy ou load balancer, seria necessário configurar `trust proxy` para
 usar o IP real do cliente. O limite atual é por IP, não por conta, então usuários
-na mesma rede podem compartilhar o contador. Se Swagger for adicionado, o CSP
-padrão do Helmet deverá ser revisado para a página `/docs`.
+na mesma rede podem compartilhar o contador. O CSP padrão do Helmet foi
+verificado com a página `/docs` e não precisou ser relaxado.
