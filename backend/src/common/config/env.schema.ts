@@ -6,6 +6,7 @@ const environmentSchema = z
       .string()
       .min(32, 'JWT_SECRET deve ter ao menos 32 caracteres'),
     JWT_EXPIRES_IN: z.string().min(1),
+    CORS_ORIGIN: z.url(),
     LOGIN_THROTTLE_LIMIT: z.coerce.number().int().positive().default(5),
     REGISTER_THROTTLE_LIMIT: z.coerce.number().int().positive().default(10),
     AUTH_THROTTLE_TTL_MS: z.coerce.number().int().positive().default(60_000),
