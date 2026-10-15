@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironment } from './common/config/env.schema';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { FilesModule } from './files/files.module';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
 
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     NotesModule,
+    FilesModule,
   ],
 })
 export class AppModule {}

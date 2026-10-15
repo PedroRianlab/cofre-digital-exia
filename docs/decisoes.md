@@ -1,9 +1,9 @@
 # Decisões de arquitetura
 
-O projeto é um monólito NestJS executado localmente. O código é separado por
-feature nos módulos `auth`, `users`, `notes` e `common`. O fluxo adotado é
-controller → service → repository → Prisma. O PostgreSQL é o único componente
-executado em Docker.
+O projeto é um monorepo executado localmente. O backend é um monólito NestJS
+organizado por feature e segue o fluxo controller → service → repository →
+Prisma. O frontend usa Next.js com App Router e também é separado por feature.
+Somente o PostgreSQL roda em Docker.
 
 ## Decisões registradas
 
@@ -27,13 +27,21 @@ executado em Docker.
 | 016 | Finais de linha        | Padroniza arquivos de texto com finais de linha LF. | [ADR 016](adr/016-padronizacao-finais-de-linha.md) |
 | 017 | Custos do Argon2id     | Define explicitamente os custos usados nos hashes de senha. | [ADR 017](adr/017-custos-explicitos-argon2id.md) |
 | 018 | Limites de requisição  | Limita requisições autenticadas e o tamanho do body JSON. | [ADR 018](adr/018-limites-globais-requisicao-body.md) |
+| 019 | Categoria de nota | Mantém categoria opcional diretamente na nota. | [ADR 019](adr/019-categoria-como-campo-da-nota.md) |
+| 020 | Swagger | Documenta e permite testar manualmente os contratos HTTP. | [ADR 020](adr/020-swagger-documentacao-teste-manual.md) |
+| 021 | Armazenamento local | Salva arquivos privados em disco usando nomes UUID. | [ADR 021](adr/021-armazenamento-local-em-disco.md) |
+| 022 | Validação de arquivos | Confere magic bytes e uma lista explícita de formatos. | [ADR 022](adr/022-validacao-de-arquivos-por-conteudo.md) |
+| 023 | JWT sem logout e refresh | Mantém o MVP stateless, sem revogação de tokens ou refresh token. | [ADR 023](adr/023-jwt-sem-logout-refresh.md) |
+| 024 | Frontend Next.js por feature | Separa rotas, componentes, estado e acesso à API por responsabilidade. | [ADR 024](adr/024-frontend-nextjs-por-feature.md) |
 
-## Limitações conhecidas
+## Estado atual
 
-A implementação atual cobre a infraestrutura, autenticação, CRUD isolado de
-notas e proteção básica contra abuso. A interface web ainda não foi feita.
+A implementação cobre autenticação, CRUD de notas, arquivos privados, preview
+de imagens e PDFs, interface responsiva, tratamento de erros e isolamento entre
+usuários. Os limites aceitos estão resumidos em [Segurança](seguranca.md).
 
 ## Próximos passos
 
-1. Com mais tempo, avaliar criptografia das notas, auditoria, compartilhamento
-   temporário, recuperação de senha e deploy.
+1. Criptografia em repouso com AES-256-GCM e rotação de chaves.
+2. Compartilhamento seguro e temporário com expiração e revogação.
+3. Revogação de sessões, recuperação de senha, auditoria e deploy.

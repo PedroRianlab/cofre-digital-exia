@@ -41,6 +41,14 @@ import { JwtAuthGuard } from './jwt-auth.guard';
             ttl,
             limit: configService.getOrThrow<number>('REGISTER_THROTTLE_LIMIT'),
           },
+          {
+            name: 'upload',
+            ttl: configService.getOrThrow<number>('UPLOAD_THROTTLE_TTL_MS'),
+            limit: configService.getOrThrow<number>('UPLOAD_THROTTLE_LIMIT'),
+            skipIf: (context) =>
+              context.getClass().name !== 'FilesController' ||
+              context.getHandler().name !== 'upload',
+          },
         ];
       },
     }),

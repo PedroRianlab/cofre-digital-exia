@@ -25,7 +25,12 @@ export class NotesRepository {
 
   findAll(userId: string, categoria?: string) {
     return this.prisma.note.findMany({
-      where: { userId, ...(categoria !== undefined && { categoria }) },
+      where: {
+        userId,
+        ...(categoria !== undefined && {
+          categoria: { equals: categoria, mode: 'insensitive' as const },
+        }),
+      },
       orderBy: { updatedAt: 'desc' },
       select: noteSelect,
     });

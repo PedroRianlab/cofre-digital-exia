@@ -1,53 +1,65 @@
 # Segurança
 
-Este documento descreve somente as proteções presentes no código atual.
+Resumo das proteções presentes no código atual. As decisões completas estão nos
+[ADRs](decisoes.md).
 
 ## Proteções implementadas
 
-- O Prisma usa consultas parametrizadas. Não há SQL cru no projeto.
-- O Zod usa `.strict()`, limites de tamanho e UUID no parâmetro `:id`.
-- Notas são consultadas por `id` e `userId`. Nota inexistente ou alheia retorna
-  404.
-- O JWT usa HS256, possui expiração e exige segredo com no mínimo 32 caracteres.
-- Senhas usam Argon2id com 19 MiB de memória, 2 iterações e paralelismo 1.
-- O login usa a mesma mensagem para e-mail inexistente ou senha incorreta.
-- Um hash falso mantém o custo do login quando o e-mail não existe.
-- O Helmet adiciona cabeçalhos HTTP de segurança.
-- Login, cadastro e rotas autenticadas possuem limites de requisição por IP.
+### Identidade e sessão
+
+- Senhas recebem hash Argon2id antes de serem armazenadas.
+- JWT usa HS256, expiração configurável e segredo de no mínimo 32 caracteres.
+- Login inválido usa uma mensagem única e executa um hash falso quando o e-mail
+  não existe.
+- O frontend remove o token ao sair e redireciona sessões expiradas.
+
+### Autorização
+
+- Toda rota privada passa pelo `JwtAuthGuard`.
+- O `userId` é extraído do JWT e nunca aceito no payload do recurso.
+- Notas e arquivos são acessados sempre por `id + userId`.
+- Recursos inexistentes e recursos de outra pessoa retornam o mesmo `404`.
+
+### Entrada, HTTP e abuso
+
+- Zod valida bodies, queries e parâmetros, limita tamanhos e rejeita campos
+  extras.
+- Helmet adiciona cabeçalhos de segurança e o CORS aceita uma origem definida.
 - O corpo JSON possui limite de 100 KB.
-- Erros 500 não devolvem detalhes internos ao cliente.
-- O arquivo `.env` é ignorado pelo Git.
+- Login, cadastro, upload e rotas autenticadas possuem limites por IP.
+- Erros `500` são registrados internamente sem expor detalhes ao cliente.
 
-## Dependências
+### Arquivos e conteúdo
 
-Os números abaixo foram conferidos com o registro do npm em 13 de outubro de
-2026.
+- Uploads têm tamanho máximo configurável e formatos permitidos explícitos.
+- O tipo real é conferido pela assinatura binária do arquivo.
+- Arquivos físicos usam UUID e ficam fora de uma pasta pública.
+- Downloads usam `attachment`, `nosniff` e `Cache-Control: private, no-store`.
+- Notas são renderizadas como texto, sem `dangerouslySetInnerHTML`.
 
-- Produção: `npm audit --omit=dev` retornou 0 vulnerabilidades conhecidas.
-- Desenvolvimento: `npm audit` retornou 35 alertas, sendo 29 altos e 6
-  moderados. Eles estão concentrados no Jest 29 e em dependências transitivas.
-- As dependências de desenvolvimento não vão para produção quando a instalação
-  usa `npm install --omit=dev`. Imagens Docker de deploy devem usar essa opção.
-- A decisão atual é não atualizar Jest e `ts-jest` no prazo do MVP. Uma
-  atualização principal poderia quebrar a suíte de testes.
-- O próximo passo é atualizar Jest e `ts-jest` e executar novamente todos os
-  testes e2e.
-- Nunca executar `npm audit fix --force`. Esse comando pode instalar versões
-  incompatíveis sem revisão.
+## Limitações aceitas no MVP
 
-O `npm audit` detecta somente vulnerabilidades já conhecidas e publicadas em sua
-base. Ele não substitui revisão de código nem testes de segurança.
+- O JWT fica no `sessionStorage`; uma falha XSS poderia expor o token.
+- O logout não revoga no backend um token já emitido. Ele funciona até expirar.
+- O blur dos cards é somente visual no frontend e não representa criptografia.
+- Notas e arquivos não possuem criptografia em repouso.
+- O rate limit usa memória e IP, sem estado compartilhado entre instâncias.
+- Arquivos ficam no disco local, sem antivírus, cota por usuário ou remoção de
+  metadados EXIF.
+- HTTPS, auditoria independente e teste de penetração não fazem parte da entrega
+  local.
 
-## Limitações conhecidas e próximos passos
+## Evoluções planejadas
 
-- O JWT não possui `issuer` nem `audience`. Eles são desnecessários neste
-  monólito com um único emissor e consumidor.
-- HTTPS não está configurado. É obrigatório em um deploy, mas não é necessário
-  para o ambiente local em `localhost`.
-- O rate limit usa memória e identifica clientes por IP. Múltiplas instâncias
-  exigiriam armazenamento compartilhado, como Redis.
-- Atrás de proxy ou balanceador, será necessário configurar `trust proxy` para
-  identificar o IP real.
-- Não há refresh token, recuperação de senha nem verificação de e-mail. Esses
-  recursos estão fora do MVP.
-- CORS e o armazenamento do token serão definidos junto com o frontend.
+- Criptografia em repouso com AES-256-GCM e rotação segura de chaves.
+- Compartilhamento seguro e temporário com expiração e revogação.
+- Refresh token, revogação de sessões e recuperação de senha.
+- Cookies `HttpOnly` com proteção CSRF, caso o modelo de sessão seja alterado.
+- Armazenamento compartilhado, auditoria de acessos e rate limit distribuído.
+
+## Verificação
+
+Os testes E2E verificam autenticação, isolamento entre usuários, arquivos
+disfarçados, limites, respostas `404`, erros sem vazamento, CORS, Helmet e rate
+limit. Para uma revisão de dependências, execute `npm audit` em cada aplicação;
+o resultado deve ser analisado antes de qualquer atualização automática.

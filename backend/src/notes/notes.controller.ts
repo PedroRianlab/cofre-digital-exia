@@ -92,7 +92,8 @@ export class NotesController {
     required: false,
     minLength: 1,
     maxLength: 50,
-    description: 'Filtra as próprias notas pela categoria exata.',
+    description:
+      'Filtra as próprias notas pela categoria, ignorando maiúsculas e minúsculas.',
   })
   @ApiResponse({
     status: 200,

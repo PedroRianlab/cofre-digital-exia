@@ -19,3 +19,12 @@ coverage/
 # Arquivos locais do Prisma
 backend/prisma/*.db
 backend/prisma/*.db-journal
+
+# Arquivos enviados localmente
+backend/storage/
+/storage/
+
+# Next.js
+frontend/.next/
+frontend/next-env.d.ts
+frontend/tsconfig.tsbuildinfo

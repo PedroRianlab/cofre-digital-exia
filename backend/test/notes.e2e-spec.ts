@@ -207,10 +207,10 @@ describe('Notes (e2e)', () => {
     expect(notes.every((note) => !('userId' in note))).toBe(true);
   });
 
-  it('filtra por categoria mantendo o isolamento por usuário', async () => {
+  it('filtra por categoria sem diferenciar maiúsculas e minúsculas', async () => {
     const response = await request(httpServer)
       .get('/notes')
-      .query({ categoria: 'Trabalho' })
+      .query({ categoria: 'trABALHO' })
       .set('Authorization', `Bearer ${userA.accessToken}`)
       .expect(200);
     const notes = response.body as unknown as NoteResponse[];

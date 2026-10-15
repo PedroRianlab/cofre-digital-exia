@@ -1,14 +1,18 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { configureBodyParser } from './common/http/configure-body-parser';
+import { configureCors } from './common/http/configure-cors';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService);
   app.use(helmet());
+  configureCors(app, configService.getOrThrow<string>('CORS_ORIGIN'));
   configureBodyParser(app);
   app.useGlobalFilters(new HttpExceptionFilter());
 
