@@ -16,6 +16,7 @@ import {
 import type { VaultFile } from "@/features/files/files.types";
 import { getApiErrorMessage } from "@/lib/api";
 import { FileCard } from "./file-card";
+import { FilePreviewDialog } from "./file-preview-dialog";
 import { UploadDialog } from "./upload-dialog";
 
 type CollectionStatus = "loading" | "ready" | "error";
@@ -25,6 +26,7 @@ export function FilesPage() {
   const [status, setStatus] = useState<CollectionStatus>("loading");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [deleting, setDeleting] = useState<VaultFile | null>(null);
+  const [previewing, setPreviewing] = useState<VaultFile | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,6 +132,7 @@ export function FilesPage() {
               key={file.id}
               file={file}
               downloading={downloadingId === file.id}
+              onPreview={canPreview(file) ? () => setPreviewing(file) : undefined}
               onDownload={() => void startDownload(file)}
               onDelete={() => setDeleting(file)}
             />
@@ -152,6 +155,12 @@ export function FilesPage() {
         onSubmit={upload}
       />
 
+      <FilePreviewDialog
+        key={previewing?.id ?? "closed"}
+        file={previewing}
+        onClose={() => setPreviewing(null)}
+      />
+
       <ConfirmDialog
         open={!!deleting}
         onClose={() => setDeleting(null)}
@@ -163,4 +172,8 @@ export function FilesPage() {
       />
     </>
   );
+}
+
+function canPreview(file: VaultFile) {
+  return file.mimeType.startsWith("image/") || file.mimeType === "application/pdf";
 }

@@ -1,4 +1,10 @@
-import { Download, FileText, Headphones, Image as ImageIcon, Trash2 } from "lucide-react";
+import {
+  Download,
+  FileText,
+  Headphones,
+  Image as ImageIcon,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { VaultFile } from "@/features/files/files.types";
 import { formatDate } from "@/lib/format-date";
@@ -6,6 +12,7 @@ import { formatDate } from "@/lib/format-date";
 type FileCardProps = {
   file: VaultFile;
   downloading: boolean;
+  onPreview?: () => void;
   onDownload: () => void;
   onDelete: () => void;
 };
@@ -13,6 +20,7 @@ type FileCardProps = {
 export function FileCard({
   file,
   downloading,
+  onPreview,
   onDownload,
   onDelete,
 }: FileCardProps) {
@@ -24,20 +32,35 @@ export function FileCard({
         ? Headphones
         : FileText;
   const createdYear = new Date(file.createdAt).getFullYear();
-
-  return (
-    <article className="rounded-lg border bg-card p-5 shadow-soft">
+  const privateDetails = (
+    <div className="select-none blur-sm" aria-hidden="true">
       <div className="mb-5 flex min-h-32 items-center justify-center rounded-md bg-secondary/60 text-primary">
-        <Icon size={42} strokeWidth={1.3} aria-hidden="true" />
+        <Icon size={42} strokeWidth={1.3} />
       </div>
 
-      <h2 className="truncate text-sm font-medium" title={file.nomeOriginal}>
-        {file.nomeOriginal}
-      </h2>
+      <h2 className="truncate text-sm font-medium">{file.nomeOriginal}</h2>
       <p className="mt-2 text-[11px] text-muted-foreground">
         {formatFileSize(file.tamanho)} · {formatDate(file.createdAt.slice(0, 10))}{" "}
         de {createdYear}
       </p>
+    </div>
+  );
+
+  return (
+    <article className="rounded-lg border bg-card p-5 shadow-soft">
+      {onPreview ? (
+        <button
+          type="button"
+          className="block w-full cursor-pointer rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={`Visualizar ${file.nomeOriginal}`}
+          title="Visualizar arquivo"
+          onClick={onPreview}
+        >
+          {privateDetails}
+        </button>
+      ) : (
+        privateDetails
+      )}
 
       <div className="mt-4 flex items-center justify-between border-t pt-3">
         <span className="text-[10px] text-muted-foreground">{fileType}</span>

@@ -164,19 +164,21 @@ Esses recursos ficam como próximos passos para uma versão futura.
 
 ## Escopo reduzido por tempo
 
-O MVP mantém o fluxo essencial de arquivos: upload, listagem, download e
-exclusão, sempre com autenticação e isolamento por usuário.
+O MVP mantém o fluxo essencial de arquivos: upload, listagem, download,
+exclusão e preview de imagens e PDFs, sempre com autenticação e isolamento por
+usuário. O arquivo do preview é buscado apenas quando a pessoa clica em
+`Visualizar`.
 
 Ficaram fora desta entrega:
 
-- preview interno de imagens, áudios e PDFs;
-- carregamento sob demanda de previews com `IntersectionObserver`;
+- preview interno de áudio;
+- carregamento automático de previews com `IntersectionObserver`;
 - barra de progresso detalhada usando `onUploadProgress`;
-- uso de URLs temporárias para previews persistentes.
 
-O download autenticado usa `URL.createObjectURL` somente durante o clique e
-libera a URL imediatamente com `URL.revokeObjectURL`; ela não é mantida no
-estado da aplicação.
+O preview e o download autenticados usam `URL.createObjectURL`. No preview, a
+URL temporária existe apenas enquanto o diálogo está aberto; no download, apenas
+durante o clique. Em ambos os casos, `URL.revokeObjectURL` libera a URL depois
+do uso.
 
 Esses itens podem ser adicionados posteriormente sem alterar as rotas básicas
 de arquivos. A decisão reduz a complexidade e mantém o foco nos fluxos
