@@ -1,0 +1,16 @@
+"use client";
+
+import { useRef, useState } from 'react';
+import { Upload, FileUp, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { acceptedFiles, validUpload } from '@/features/files/files.validation';
+import { simulate } from '@/providers/mock-vault-provider';
+
+export function UploadDialog({ open, onClose, onSubmit }: { open: boolean; onClose: () => void; onSubmit: (file: File) => void }) {
+ const [file, setFile] = useState<File | null>(null); const [error, setError] = useState(''); const [progress, setProgress] = useState(0); const input = useRef<HTMLInputElement>(null); const {handleSubmit, formState: {isSubmitting}} = useForm();
+ const choose = (files: FileList | null) => { if (!files) return; if (!validUpload(files)) {setError('Selecione exatamente um arquivo em um dos formatos aceitos.'); setFile(null); return;} setFile(files[0] ?? null); setError(''); };
+ return <Dialog open={open} onOpenChange={(value) => {if (!value && !isSubmitting) {setFile(null); setError(''); onClose();}}}><DialogContent className="max-w-[calc(100%-2rem)] rounded-lg sm:max-w-lg"><DialogHeader><DialogTitle>Guardar um arquivo</DialogTitle><DialogDescription className="pt-2">Uma imagem, um áudio ou um documento para lembrar.</DialogDescription></DialogHeader><form onSubmit={handleSubmit(async () => {if (!file) {setError('Escolha um arquivo para continuar.'); return;} setProgress(25); await simulate(); setProgress(75); await simulate(); onSubmit(file); setProgress(0); setFile(null); onClose();})}><input ref={input} type="file" accept={acceptedFiles} className="sr-only" aria-label="Selecionar arquivo" onChange={(e) => choose(e.target.files)}/><div onDragOver={(e) => e.preventDefault()} onDrop={(e) => {e.preventDefault(); if (!isSubmitting) choose(e.dataTransfer.files);}} className="mt-2 flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border border-dashed bg-secondary/30 p-6 text-center"><Upload className="text-primary" size={27}/><Button type="button" variant="outline" onClick={() => input.current?.click()} disabled={isSubmitting}>Selecionar arquivo</Button><p className="text-xs text-muted-foreground">Ou solte um arquivo aqui</p></div><p className="mt-3 text-[10px] leading-5 text-muted-foreground">PDF · MP3, WAV, OGG, M4A · PNG, JPG, WEBP, GIF</p>{file && <div className="mt-4 flex items-center gap-3 rounded-md bg-secondary p-3"><FileUp className="shrink-0 text-primary"/><span className="min-w-0 flex-1 truncate text-xs">{file.name}</span><Button type="button" size="icon" variant="ghost" aria-label="Remover seleção" disabled={isSubmitting} onClick={() => setFile(null)}><X/></Button></div>}{error && <p role="alert" className="mt-3 text-xs text-destructive">{error}</p>}{isSubmitting && <Progress value={progress} aria-label="Progresso do envio" className="mt-4"/>}<div className="mt-6 flex justify-end gap-3"><Button variant="outline" type="button" onClick={onClose} disabled={isSubmitting}>Cancelar</Button><Button type="submit" disabled={isSubmitting}><Upload/>{isSubmitting ? 'Guardando…' : 'Guardar arquivo'}</Button></div></form></DialogContent></Dialog>;
+}
