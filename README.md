@@ -64,6 +64,9 @@ npm.cmd run start:dev
 
 A API roda em `http://localhost:3000`.
 
+O CORS aceita somente a origem definida em `CORS_ORIGIN`. No ambiente local, o
+valor esperado é `http://localhost:3001`; não é usada origem curinga (`*`).
+
 ### Documentação Swagger
 
 Com o backend em execução, acesse `http://localhost:3000/docs`. A documentação
@@ -111,6 +114,10 @@ npm.cmd install
 npm.cmd run dev
 ```
 
+O frontend roda em `http://localhost:3001` e usa `NEXT_PUBLIC_API_URL` para
+localizar a API. Copie `frontend/.env.example` para `frontend/.env.local` se
+precisar alterar o endereço padrão.
+
 ### Testes do backend
 
 Com o banco iniciado:
@@ -131,6 +138,20 @@ npm.cmd run test:e2e
 - O corpo JSON de cada requisição possui limite de 100 KB.
 - Uploads aceitam um arquivo de até `MAX_UPLOAD_MB`, validado pelos bytes reais.
 - Arquivos usam nome físico UUID e só podem ser acessados pelo próprio usuário.
+- O CORS é restrito à origem configurada para o frontend.
+
+## Decisões de segurança do frontend
+
+O JWT fica em `sessionStorage`, por isso permanece somente na aba atual. Essa
+escolha simplifica o MVP, mas JavaScript executado por uma falha de XSS poderia
+ler o token; uma evolução seria usar cookie `HttpOnly` com proteção contra CSRF.
+
+As rotas privadas fazem uma proteção visual no navegador, evitando renderizar o
+conteúdo sem sessão. A proteção real continua no backend: toda requisição
+privada precisa de JWT válido e recebe HTTP 401 quando não está autenticada.
+
+O conteúdo das notas é renderizado como texto, sem `dangerouslySetInnerHTML`,
+reduzindo a superfície para injeção de HTML e roubo do token.
 
 ## Trade-offs do limite de tentativas
 
