@@ -163,8 +163,11 @@ Ficaram fora desta entrega:
 - preview interno de imagens, áudios e PDFs;
 - carregamento sob demanda de previews com `IntersectionObserver`;
 - barra de progresso detalhada usando `onUploadProgress`;
-- criação e gerenciamento de URLs temporárias com `URL.createObjectURL` e
-  `URL.revokeObjectURL`.
+- uso de URLs temporárias para previews persistentes.
+
+O download autenticado usa `URL.createObjectURL` somente durante o clique e
+libera a URL imediatamente com `URL.revokeObjectURL`; ela não é mantida no
+estado da aplicação.
 
 Esses itens podem ser adicionados posteriormente sem alterar as rotas básicas
 de arquivos. A decisão reduz a complexidade e mantém o foco nos fluxos
