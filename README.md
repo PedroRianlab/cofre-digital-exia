@@ -1,7 +1,7 @@
 # Cofre Digital EXIA
 
-Aplicação web para guardar notas privadas. O usuário pode se cadastrar, fazer
-login e gerenciar somente as próprias notas.
+Aplicação web para guardar notas e arquivos privados. O usuário pode se
+cadastrar, fazer login e gerenciar somente os próprios recursos.
 
 O projeto é um monorepo com frontend em React/Next e backend em NestJS. O
 backend usa PostgreSQL, Prisma, Zod, JWT e Argon2id.
@@ -32,6 +32,10 @@ Copy-Item .env.example .env
 
 Edite `backend/.env` e defina uma senha local. O valor de `POSTGRES_PASSWORD`
 deve ser o mesmo usado em `DATABASE_URL`.
+
+`STORAGE_DIR` define a pasta privada dos uploads, relativa ao diretório em que a
+API é iniciada, e `MAX_UPLOAD_MB` define o limite por arquivo (20 MB por padrão).
+A pasta padrão `backend/storage/` é criada automaticamente e ignorada pelo Git.
 
 `npm.cmd install` é necessário somente na primeira execução, quando as
 dependências forem alteradas ou se a pasta `backend/node_modules` for removida.
@@ -73,6 +77,8 @@ Fluxo para testar manualmente:
 2. Execute `POST /auth/login` com as mesmas credenciais e copie o `accessToken`.
 3. Clique em **Authorize** e informe somente o token, sem o prefixo `Bearer`.
 4. Teste a criação, listagem, consulta, edição e exclusão em `notes`.
+5. Em `files`, envie PDF, áudio ou imagem pelo campo multipart `file` e teste os
+   endpoints de metadados, download e exclusão.
 
 O login aceita 5 tentativas por IP a cada 60 segundos. Se receber HTTP 429,
 aguarde 60 segundos antes de tentar novamente.
@@ -123,6 +129,8 @@ npm.cmd run test:e2e
 - Login aceita 5 tentativas por IP a cada 60 segundos; cadastro aceita 10.
 - Rotas autenticadas aceitam 100 requisições por IP a cada 60 segundos.
 - O corpo JSON de cada requisição possui limite de 100 KB.
+- Uploads aceitam um arquivo de até `MAX_UPLOAD_MB`, validado pelos bytes reais.
+- Arquivos usam nome físico UUID e só podem ser acessados pelo próprio usuário.
 
 ## Trade-offs do limite de tentativas
 
