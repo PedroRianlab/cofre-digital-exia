@@ -2,13 +2,21 @@ import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-export function NoteSearchField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function NoteSearchField({
+  id = "nota-busca",
+  value,
+  onChange,
+}: {
+  id?: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <div className="relative w-full md:w-72">
-      <label className="sr-only" htmlFor="nota-busca">Buscar nas notas</label>
+      <label className="sr-only" htmlFor={id}>Buscar nas notas</label>
       <Search aria-hidden="true" size={15} strokeWidth={1.8} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
       <Input
-        id="nota-busca"
+        id={id}
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}

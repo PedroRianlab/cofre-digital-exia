@@ -126,15 +126,28 @@ export function NotesPage({ onCreate, onEdit }: NotesPageProps) {
         title="Seu cofre de notas."
         description="Suas notas, com discrição e segurança."
         action={
-          <Button onClick={onCreate}>
-            <Plus />
-            Nova nota
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <NoteSearchField
+                id="nota-busca-desktop"
+                value={query}
+                onChange={setQuery}
+              />
+            </div>
+            <Button onClick={onCreate}>
+              <Plus />
+              Nova nota
+            </Button>
+          </div>
         }
       />
 
-      <div className="mb-7">
-        <NoteSearchField value={query} onChange={setQuery} />
+      <div className="mb-7 md:hidden">
+        <NoteSearchField
+          id="nota-busca-mobile"
+          value={query}
+          onChange={setQuery}
+        />
       </div>
 
       <div className="mb-5 flex items-center justify-between">
