@@ -153,6 +153,15 @@ privada precisa de JWT válido e recebe HTTP 401 quando não está autenticada.
 O conteúdo das notas é renderizado como texto, sem `dangerouslySetInnerHTML`,
 reduzindo a superfície para injeção de HTML e roubo do token.
 
+## Limitações de autenticação
+
+O MVP possui somente as rotas `POST /auth/register` e `POST /auth/login`.
+Não foram implementados refresh token, logout no backend, recuperação de senha
+ou alteração de senha. O logout atual remove o JWT do `sessionStorage` no
+frontend e redireciona para a tela de login.
+
+Esses recursos ficam como próximos passos para uma versão futura.
+
 ## Escopo reduzido por tempo
 
 O MVP mantém o fluxo essencial de arquivos: upload, listagem, download e

@@ -31,6 +31,7 @@ executado em Docker.
 | 020 | Swagger | Documenta e permite testar manualmente os contratos HTTP. | [ADR 020](adr/020-swagger-documentacao-teste-manual.md) |
 | 021 | Armazenamento local | Salva arquivos privados em disco usando nomes UUID. | [ADR 021](adr/021-armazenamento-local-em-disco.md) |
 | 022 | Validação de arquivos | Confere magic bytes e uma lista explícita de formatos. | [ADR 022](adr/022-validacao-de-arquivos-por-conteudo.md) |
+| 023 | JWT sem logout e refresh | Mantém o MVP stateless, sem revogação de tokens ou refresh token. | [ADR 023](adr/023-jwt-sem-logout-refresh.md) |
 
 ## Limitações conhecidas
 
