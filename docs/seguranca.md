@@ -15,6 +15,11 @@ Este documento descreve somente as proteções presentes no código atual.
 - O Helmet adiciona cabeçalhos HTTP de segurança.
 - Login, cadastro e rotas autenticadas possuem limites de requisição por IP.
 - O corpo JSON possui limite de 100 KB.
+- Uploads usam pasta privada, nome físico UUID e limite configurável de tamanho.
+- Arquivos são identificados pelos magic bytes e por uma lista de formatos.
+- Arquivos privados são consultados sempre por `id` e `userId` do JWT.
+- Downloads usam `attachment`, `nosniff` e `Cache-Control: private, no-store`.
+- O upload possui limite próprio de requisições por IP.
 - Erros 500 não devolvem detalhes internos ao cliente.
 - O arquivo `.env` é ignorado pelo Git.
 
@@ -24,7 +29,7 @@ Os números abaixo foram conferidos com o registro do npm em 13 de outubro de
 2026.
 
 - Produção: `npm audit --omit=dev` retornou 0 vulnerabilidades conhecidas.
-- Desenvolvimento: `npm audit` retornou 35 alertas, sendo 29 altos e 6
+- Desenvolvimento: `npm audit` retornou 36 alertas, sendo 29 altos e 7
   moderados. Eles estão concentrados no Jest 29 e em dependências transitivas.
 - As dependências de desenvolvimento não vão para produção quando a instalação
   usa `npm install --omit=dev`. Imagens Docker de deploy devem usar essa opção.
@@ -51,3 +56,9 @@ base. Ele não substitui revisão de código nem testes de segurança.
 - Não há refresh token, recuperação de senha nem verificação de e-mail. Esses
   recursos estão fora do MVP.
 - CORS e o armazenamento do token serão definidos junto com o frontend.
+- Não há antivírus nem criptografia dos arquivos em repouso.
+- O armazenamento em disco local não escala para múltiplas instâncias.
+- Metadados EXIF de imagens não são removidos.
+- Não existe cota total de armazenamento por usuário.
+- Se o disco falhar depois da exclusão do registro, pode restar um arquivo
+  órfão, registrado nos logs internos para tratamento posterior.

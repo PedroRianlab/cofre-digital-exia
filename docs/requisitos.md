@@ -106,6 +106,26 @@ ou alheia retorna HTTP 404.
 Como foi testado: tentativa sobre nota alheia não a remove, enquanto a remoção
 da própria nota retorna 204 e ela deixa de ser encontrada.
 
+### RF08 - Gerenciar arquivos privados
+
+**Status:** Implementado
+
+`POST /files` recebe um único arquivo multipart, valida seu formato pelos bytes
+reais e salva o conteúdo em pasta privada com nome UUID. PDF, MP3, WAV, OGG,
+M4A, PNG, JPEG, WEBP e GIF são permitidos; tipos desconhecidos e SVG retornam
+HTTP 415. O limite padrão é 20 MB e pode ser alterado por ambiente.
+
+`GET /files`, `GET /files/:id`, `GET /files/:id/download` e
+`DELETE /files/:id` usam sempre o `userId` do JWT. Um arquivo inexistente ou de
+outro usuário retorna o mesmo HTTP 404. Respostas públicas não expõem
+`storageKey` nem `userId`.
+
+Como foi testado: `backend/test/files.e2e-spec.ts` cobre formatos válidos,
+arquivos disfarçados e truncados, limite de tamanho, autenticação, UUID,
+isolamento entre dois usuários, nomes UTF-8, download, exclusão e tentativa de
+path traversal. `backend/test/files-throttling.e2e-spec.ts` cobre o limite de
+frequência do upload.
+
 ### RNF05 - Tratamento padronizado de erros
 
 **Status:** Implementado

@@ -27,6 +27,10 @@ executado em Docker.
 | 016 | Finais de linha        | Padroniza arquivos de texto com finais de linha LF. | [ADR 016](adr/016-padronizacao-finais-de-linha.md) |
 | 017 | Custos do Argon2id     | Define explicitamente os custos usados nos hashes de senha. | [ADR 017](adr/017-custos-explicitos-argon2id.md) |
 | 018 | Limites de requisição  | Limita requisições autenticadas e o tamanho do body JSON. | [ADR 018](adr/018-limites-globais-requisicao-body.md) |
+| 019 | Categoria de nota | Mantém categoria opcional diretamente na nota. | [ADR 019](adr/019-categoria-como-campo-da-nota.md) |
+| 020 | Swagger | Documenta e permite testar manualmente os contratos HTTP. | [ADR 020](adr/020-swagger-documentacao-teste-manual.md) |
+| 021 | Armazenamento local | Salva arquivos privados em disco usando nomes UUID. | [ADR 021](adr/021-armazenamento-local-em-disco.md) |
+| 022 | Validação de arquivos | Confere magic bytes e uma lista explícita de formatos. | [ADR 022](adr/022-validacao-de-arquivos-por-conteudo.md) |
 
 ## Limitações conhecidas
 
