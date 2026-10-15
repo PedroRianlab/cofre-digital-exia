@@ -1,50 +1,138 @@
-# Frontend — Cofre de Notas
+# Frontend — Cofre Digital EXIA
 
-Interface do MVP de notas privadas, feita com Next.js. Nesta etapa existe apenas a base do projeto e suas dependências; as telas serão adicionadas nas próximas etapas.
+Interface web do cofre de notas e arquivos privados. Foi construída com Next.js
+e consome a API NestJS usando Axios.
 
-## Requisitos
+Para instalar e executar o projeto completo, consulte o
+[README principal](../README.md).
 
-- Node.js 20.19 ou superior
-- npm
+## Funcionalidades
+
+- Cadastro, login, logout local e tratamento de sessão expirada.
+- CRUD completo de notas.
+- Busca local de notas por categoria, sem diferenciar maiúsculas e minúsculas.
+- Upload, listagem, download e exclusão de arquivos privados.
+- Preview autenticado de imagens e PDFs.
+- Estados de loading, erro, vazio e sucesso.
+- Confirmação antes de excluir e bloqueio durante requisições.
+- Layout responsivo para celular, tablet e desktop.
 
 ## Como executar
 
-```bash
-cd frontend
-npm install
-npm run dev
+O backend precisa estar disponível em `http://localhost:3000`.
+
+```powershell
+Set-Location frontend
+Copy-Item .env.example .env.local
+npm.cmd install
+npm.cmd run dev
 ```
 
-Abra `http://localhost:3000` no navegador.
+Acesse `http://localhost:3001`.
 
-## Dependências instaladas
+O endereço da API pode ser alterado em `frontend/.env.local`:
 
-| Pacote | Versão | Uso no projeto |
-| --- | --- | --- |
-| `next` | 16.4.1 | Framework React e rotas do frontend. |
-| `react` | 19.3.0 | Criação da interface. |
-| `react-dom` | 19.3.0 | Renderização do React no navegador. |
-| `tailwindcss` | 4.3.3 | Estilos por classes; será a base visual inspirada no Claude. |
-| `@tailwindcss/turbopack` | 4.3.3 | Integração do Tailwind com o ambiente de desenvolvimento. |
-| `axios` | 1.20.0 | Chamadas HTTP para a API NestJS. |
-| `react-hook-form` | 7.90.0 | Controle dos formulários de login, cadastro e notas. |
-| `lucide-react` | 1.57.0 | Ícones da interface. |
-| `clsx` | 2.1.1 | Combina classes CSS condicionalmente. |
-| `tailwind-merge` | 3.7.0 | Resolve conflitos entre classes do Tailwind. |
-| `class-variance-authority` | 0.7.1 | Define variações reutilizáveis, como botão normal e botão de perigo. |
-| `@radix-ui/react-dialog` | 1.3.1 | Comportamento acessível para diálogos, como confirmar exclusão. |
-| `@radix-ui/react-label` | 2.1.17 | Rótulos de formulário acessíveis. |
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
 
-## Ferramentas de desenvolvimento
+## Como funciona
 
-| Pacote | Versão | Uso no projeto |
-| --- | --- | --- |
-| `shadcn` | 4.21.5 | CLI para adicionar componentes que ficam no nosso próprio código. |
-| `typescript` | 5.9.3 | Tipagem estática. |
-| `eslint` | 9.39.5 | Verificação de qualidade do código. |
-| `eslint-config-next` | 16.4.1 | Regras de lint recomendadas pelo Next.js. |
+```text
+Next.js App Router
+   |
+   +-- /login --------------------> AuthProvider
+   |                                  |
+   |                                  +-- JWT no sessionStorage
+   |
+   +-- Rotas privadas ------------> PrivateShell
+          |
+          +-- /notas -------------> components -> notes.api.ts
+          |
+          +-- /arquivos ----------> components -> files.api.ts
+                                                |
+                                                v
+                                     Cliente Axios compartilhado
+                                                |
+                                      Authorization: Bearer JWT
+                                                |
+                                                v
+                                           API NestJS
+```
 
-## Decisão sobre componentes
+As páginas definem as rotas e delegam a interface e as regras de apresentação
+para componentes dentro de cada feature. O acesso HTTP fica nos arquivos
+`*.api.ts`; configuração, autenticação e mensagens de erro ficam em
+`src/lib/api.ts`.
 
-Usaremos Shadcn para gerar apenas os componentes necessários. Ele usa Tailwind para o visual e Radix quando precisamos de comportamento mais complexo e acessível. Por enquanto, `Dialog` e `Label` são os únicos pacotes Radix instalados; novos pacotes só entram quando um componente real exigir.
+## Organização
 
+```text
+src/
+├── app/                 # Rotas e layouts do App Router
+├── components/
+│   ├── feedback/        # Loading, erro, vazio e confirmação
+│   ├── layout/          # Estrutura das páginas privadas
+│   └── ui/              # Componentes visuais compartilhados
+├── features/
+│   ├── auth/            # Login, cadastro, tipos e validação
+│   ├── notes/           # Lista, busca, formulário e API de notas
+│   └── files/           # Upload, cards, preview e API de arquivos
+├── lib/                 # Axios, erros, datas e utilitários
+└── providers/           # Sessão e providers globais
+```
+
+A decisão arquitetural está registrada no
+[ADR 024](../docs/adr/024-frontend-nextjs-por-feature.md).
+
+## Formulários e estado
+
+React Hook Form é usado somente nos três formulários existentes:
+
+- autenticação;
+- criação e edição de notas;
+- upload de arquivo.
+
+Ele controla validação, submissão e bloqueio durante o envio. Busca, coleções,
+loading, diálogos e previews usam principalmente `useState`. A sessão usa
+Context e `useSyncExternalStore`.
+
+Não foram adicionados Zustand ou React Query. Para o tamanho atual do MVP, o
+estado local mantém o fluxo mais direto; atualização e sincronização das listas
+são feitas manualmente após cada requisição.
+
+## Sessão e segurança
+
+O token JWT fica no `sessionStorage` e é enviado pelo Axios no cabeçalho
+`Authorization`. Ao receber HTTP `401`, o frontend limpa a sessão e redireciona
+para o login.
+
+A proteção de rota no navegador evita exibir páginas privadas sem sessão, mas a
+segurança real está no backend. A API valida o JWT e o proprietário de cada
+recurso.
+
+Notas são renderizadas como texto, sem `dangerouslySetInnerHTML`. O blur dos
+cards de arquivo é apenas visual e não representa criptografia ou autorização.
+
+## Preview de arquivos
+
+Imagens e PDFs são buscados somente quando a pessoa abre o preview. A resposta
+autenticada é convertida em uma URL temporária com `URL.createObjectURL`, que é
+liberada com `URL.revokeObjectURL` ao fechar o diálogo.
+
+Áudios continuam disponíveis para download, mas não possuem preview interno.
+Também não há progresso detalhado de upload nem carregamento automático com
+`IntersectionObserver`.
+
+## Validação
+
+```powershell
+Set-Location frontend
+npm.cmd run lint
+npx.cmd tsc --noEmit
+npm.cmd run build
+```
+
+O frontend ainda não possui testes automatizados próprios. Os fluxos principais
+são testados manualmente com a API local; regras críticas de autenticação,
+isolamento e arquivos são cobertas pelos testes E2E do backend.
