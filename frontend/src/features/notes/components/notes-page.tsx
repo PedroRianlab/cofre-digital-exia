@@ -177,7 +177,7 @@ export function NotesPage({ onCreate, onEdit }: NotesPageProps) {
       {status === "ready" && visibleNotes.length === 0 && searching && (
         <EmptyState
           title="Nada encontrado"
-          description="Nenhuma nota corresponde à sua busca."
+          description="Nenhuma nota corresponde a essa categoria."
           action="Limpar busca"
           onAction={() => setQuery("")}
         />

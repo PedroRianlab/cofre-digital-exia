@@ -13,7 +13,7 @@ export function NoteSearchField({
 }) {
   return (
     <div className="relative w-full md:w-72">
-      <label className="sr-only" htmlFor={id}>Buscar nas notas</label>
+      <label className="sr-only" htmlFor={id}>Buscar por categoria</label>
       <Search aria-hidden="true" size={15} strokeWidth={1.8} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
       <Input
         id={id}
@@ -21,8 +21,8 @@ export function NoteSearchField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => { if (event.key === 'Escape') onChange(''); }}
-        placeholder="Buscar nas notas"
-        aria-label="Buscar nas notas"
+        placeholder="Buscar por categoria"
+        aria-label="Buscar por categoria"
         className="h-11 rounded-md border-border/60 bg-secondary/50 pl-9 pr-9 placeholder:text-muted-foreground focus-visible:border-border focus-visible:bg-card"
       />
       {value && (

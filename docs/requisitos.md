@@ -64,9 +64,10 @@ token.
 **Status:** Implementado
 
 `GET /notes` filtra sempre pelo `userId` obtido do JWT e aceita o parâmetro
-opcional `categoria`. A listagem mantém a ordenação por `updatedAt` decrescente.
-Parâmetros desconhecidos ou categoria acima de 50 caracteres retornam HTTP 400.
-A resposta contém `categoria`, mas não contém `userId`.
+opcional `categoria`, sem diferenciar letras maiúsculas e minúsculas. A listagem
+mantém a ordenação por `updatedAt` decrescente. Parâmetros desconhecidos ou
+categoria acima de 50 caracteres retornam HTTP 400. A resposta contém
+`categoria`, mas não contém `userId`.
 
 Como foi testado: dois usuários possuem notas com a mesma categoria, e o filtro
 retorna somente a nota do usuário autenticado. Uma categoria existente apenas
