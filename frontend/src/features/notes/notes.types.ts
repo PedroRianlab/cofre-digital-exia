@@ -1,9 +1,20 @@
 export type Note = {
   id: string;
-  title: string;
-  category: string;
-  content: string;
-  date: string;
+  titulo: string;
+  conteudo: string;
+  categoria: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type NoteInput = Pick<Note, "title" | "category" | "content">;
+export type NoteFormValues = {
+  titulo: string;
+  conteudo: string;
+  categoria: string;
+};
+
+export type NoteInput = {
+  titulo: string;
+  conteudo: string;
+  categoria?: string;
+};

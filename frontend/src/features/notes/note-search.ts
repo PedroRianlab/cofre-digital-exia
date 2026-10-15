@@ -6,7 +6,7 @@ export function filterNotes(notes: Note[], query: string) {
   if (!normalized) return notes;
 
   return notes.filter((note) =>
-    [note.title, note.category, note.content].some((value) =>
+    [note.titulo, note.categoria ?? "", note.conteudo].some((value) =>
       value.toLocaleLowerCase("pt-BR").includes(normalized),
     ),
   );

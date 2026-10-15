@@ -153,6 +153,23 @@ privada precisa de JWT válido e recebe HTTP 401 quando não está autenticada.
 O conteúdo das notas é renderizado como texto, sem `dangerouslySetInnerHTML`,
 reduzindo a superfície para injeção de HTML e roubo do token.
 
+## Escopo reduzido por tempo
+
+O MVP mantém o fluxo essencial de arquivos: upload, listagem, download e
+exclusão, sempre com autenticação e isolamento por usuário.
+
+Ficaram fora desta entrega:
+
+- preview interno de imagens, áudios e PDFs;
+- carregamento sob demanda de previews com `IntersectionObserver`;
+- barra de progresso detalhada usando `onUploadProgress`;
+- criação e gerenciamento de URLs temporárias com `URL.createObjectURL` e
+  `URL.revokeObjectURL`.
+
+Esses itens podem ser adicionados posteriormente sem alterar as rotas básicas
+de arquivos. A decisão reduz a complexidade e mantém o foco nos fluxos
+necessários para a entrega local.
+
 ## Trade-offs do limite de tentativas
 
 O Throttler identifica clientes pelo IP e armazena contadores em memória, opção

@@ -9,15 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { Note, NoteInput } from "@/features/notes/notes.types";
+import type { Note, NoteFormValues } from "@/features/notes/notes.types";
 import { validNote } from "@/features/notes/notes.validation";
-import { simulate } from "@/providers/mock-vault-provider";
+import { getApiErrorMessage } from "@/lib/api";
 
 type NoteFormPageProps = {
   note?: Note;
   missing?: boolean;
   onCancel: () => void;
-  onSubmit: (value: NoteInput) => void;
+  onSubmit: (value: NoteFormValues) => Promise<void>;
 };
 
 export function NoteFormPage({
@@ -31,15 +31,15 @@ export function NoteFormPage({
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<NoteInput>({
+  } = useForm<NoteFormValues>({
     defaultValues: {
-      title: note?.title ?? "",
-      category: note?.category ?? "",
-      content: note?.content ?? "",
+      titulo: note?.titulo ?? "",
+      categoria: note?.categoria ?? "",
+      conteudo: note?.conteudo ?? "",
     },
   });
-  const title = useWatch({ control, name: "title" }) ?? "";
-  const content = useWatch({ control, name: "content" }) ?? "";
+  const titulo = useWatch({ control, name: "titulo" }) ?? "";
+  const conteudo = useWatch({ control, name: "conteudo" }) ?? "";
 
   if (missing) {
     return (
@@ -56,12 +56,15 @@ export function NoteFormPage({
     );
   }
 
-  async function submit(value: NoteInput) {
+  async function submit(value: NoteFormValues) {
     if (!validNote(value)) return;
 
-    await simulate();
-    onSubmit(value);
-    toast.success(note ? "Nota atualizada." : "Nota criada.");
+    try {
+      await onSubmit(value);
+      toast.success(note ? "Nota atualizada." : "Nota criada.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    }
   }
 
   return (
@@ -82,16 +85,16 @@ export function NoteFormPage({
 
       <form onSubmit={handleSubmit(submit)} className="space-y-7">
         <div>
-          <Label htmlFor="title">
+          <Label htmlFor="titulo">
             Título <span className="text-primary">*</span>
           </Label>
           <Input
-            id="title"
+            id="titulo"
             placeholder="Um título para lembrar"
             className="mt-2 h-12"
             maxLength={120}
-            aria-invalid={!!errors.title}
-            {...register("title", {
+            aria-invalid={!!errors.titulo}
+            {...register("titulo", {
               required: "Dê um título à sua nota.",
               validate: (value) =>
                 value.trim().length > 0 || "Dê um título à sua nota.",
@@ -104,48 +107,48 @@ export function NoteFormPage({
           <div className="mt-2 flex justify-between text-xs">
             <span
               className="text-destructive"
-              role={errors.title ? "alert" : undefined}
+              role={errors.titulo ? "alert" : undefined}
             >
-              {errors.title?.message}
+              {errors.titulo?.message}
             </span>
-            <span className="text-muted-foreground">{title.length}/120</span>
+            <span className="text-muted-foreground">{titulo.length}/120</span>
           </div>
         </div>
 
         <div>
-          <Label htmlFor="category">
+          <Label htmlFor="categoria">
             Categoria
             <span className="ml-1 text-xs font-normal text-muted-foreground">
               opcional
             </span>
           </Label>
           <Input
-            id="category"
+            id="categoria"
             className="mt-2 h-12"
             placeholder="Por exemplo: pessoal, ideias, leituras"
             maxLength={50}
-            {...register("category", {
+            {...register("categoria", {
               maxLength: {
                 value: 50,
                 message: "Use até 50 caracteres.",
               },
             })}
           />
-          {errors.category && (
+          {errors.categoria && (
             <p role="alert" className="mt-2 text-xs text-destructive">
-              {errors.category.message}
+              {errors.categoria.message}
             </p>
           )}
         </div>
 
         <div>
-          <Label htmlFor="content">Conteúdo</Label>
+          <Label htmlFor="conteudo">Conteúdo</Label>
           <Textarea
-            id="content"
+            id="conteudo"
             placeholder="Comece por aqui…"
             className="mt-2 min-h-72 resize-y p-5 font-reading text-base leading-8"
             maxLength={10_000}
-            {...register("content", {
+            {...register("conteudo", {
               maxLength: {
                 value: 10_000,
                 message: "Use até 10.000 caracteres.",
@@ -153,7 +156,7 @@ export function NoteFormPage({
             })}
           />
           <p className="mt-2 text-right text-xs text-muted-foreground">
-            {content.length.toLocaleString("pt-BR")}/10.000
+            {conteudo.length.toLocaleString("pt-BR")}/10.000
           </p>
         </div>
 

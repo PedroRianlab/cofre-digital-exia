@@ -1,10 +1,10 @@
-import type { NoteInput } from "./notes.types";
+import type { NoteFormValues } from "./notes.types";
 
-export function validNote(value: NoteInput) {
+export function validNote(value: NoteFormValues) {
   return (
-    value.title.trim().length > 0 &&
-    value.title.length <= 120 &&
-    value.category.length <= 50 &&
-    value.content.length <= 10_000
+    value.titulo.trim().length > 0 &&
+    value.titulo.length <= 120 &&
+    value.categoria.length <= 50 &&
+    value.conteudo.length <= 10_000
   );
 }
