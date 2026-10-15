@@ -20,6 +20,7 @@ Next.js rodam diretamente na máquina.
 - [Decisões e trade-offs](#decisões-e-trade-offs)
 - [Limitações conhecidas](#limitações-conhecidas)
 - [Próximos passos](#próximos-passos)
+- [Documentação complementar](#documentação-complementar)
 
 ## O que está pronto
 
@@ -405,10 +406,11 @@ As justificativas completas estão registradas nos
 
 ## Documentação complementar
 
-- [Requisitos implementados](docs/requisitos.md)
-- [Arquitetura e ADRs](docs/decisoes.md)
-- [Segurança](docs/seguranca.md)
-- [Como contribuir](CONTRIBUICAO.md)
+- [Requisitos implementados](docs/requisitos.md): resumo do escopo atendido pelo MVP.
+- [Segurança](docs/seguranca.md): controles adotados, riscos aceitos e limites da solução.
+- [Decisões arquiteturais](docs/decisoes.md): índice dos ADRs que justificam as principais escolhas técnicas.
+- [Frontend](frontend/README.md): organização, configuração e execução da interface.
+- [Como contribuir](CONTRIBUICAO.md): orientações para colaborar com o projeto.
 
 ## Licença
 
