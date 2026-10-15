@@ -8,13 +8,13 @@ import { EmptyState } from "@/components/feedback/states";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { downloadFile } from "@/features/files/download-file";
-import { getFileErrorMessage } from "@/features/files/file-error-message";
 import {
   deleteFileRequest,
   listFilesRequest,
   uploadFileRequest,
 } from "@/features/files/files.api";
 import type { VaultFile } from "@/features/files/files.types";
+import { getApiErrorMessage } from "@/lib/api";
 import { FileCard } from "./file-card";
 import { UploadDialog } from "./upload-dialog";
 
@@ -71,7 +71,7 @@ export function FilesPage() {
       await downloadFile(file);
       toast.success("Download iniciado.");
     } catch (error) {
-      toast.error(getFileErrorMessage(error));
+      toast.error(getApiErrorMessage(error));
     } finally {
       setDownloadingId(null);
     }
@@ -83,7 +83,7 @@ export function FilesPage() {
       setFiles((current) => current.filter((item) => item.id !== file.id));
       toast.success("Arquivo excluído.");
     } catch (error) {
-      toast.error(getFileErrorMessage(error));
+      toast.error(getApiErrorMessage(error));
       throw error;
     }
   }

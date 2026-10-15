@@ -11,11 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getFileErrorMessage } from "@/features/files/file-error-message";
 import {
   acceptedFiles,
   validUpload,
 } from "@/features/files/files.validation";
+import { getApiErrorMessage } from "@/lib/api";
 
 type UploadDialogProps = {
   open: boolean;
@@ -61,7 +61,7 @@ export function UploadDialog({ open, onClose, onSubmit }: UploadDialogProps) {
       await onSubmit(file);
       close();
     } catch (submitError) {
-      setError(getFileErrorMessage(submitError));
+      setError(getApiErrorMessage(submitError));
     }
   }
 

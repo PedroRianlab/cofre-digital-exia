@@ -12,6 +12,17 @@ export type ApiErrorResponse = {
   fields?: Array<{ field: string; message: string }>;
 };
 
+const messagesByStatus: Record<number, string> = {
+  400: "Dados inválidos. Verifique as informações enviadas.",
+  401: "Sua sessão expirou. Entre novamente.",
+  404: "Recurso não encontrado.",
+  409: "Este e-mail já está cadastrado.",
+  413: "O arquivo ultrapassa o limite permitido.",
+  415: "Tipo de arquivo não permitido.",
+  429: "Muitas solicitações. Aguarde e tente novamente.",
+  500: "Erro interno do servidor. Tente novamente.",
+};
+
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000",
   timeout: 10_000,
@@ -56,7 +67,21 @@ export function getApiErrorMessage(
 ) {
   if (!axios.isAxiosError<ApiErrorResponse>(error)) return fallback;
 
-  const message = error.response?.data?.message;
+  if (!error.response) {
+    return "Não foi possível conectar à API.";
+  }
+
+  if (
+    error.response.status === 401 &&
+    error.config?.url?.startsWith("/auth/login")
+  ) {
+    return "Credenciais inválidas.";
+  }
+
+  const knownMessage = messagesByStatus[error.response.status];
+  if (knownMessage) return knownMessage;
+
+  const message = error.response.data.message;
 
   if (Array.isArray(message)) return message.join(" ");
   return message || fallback;

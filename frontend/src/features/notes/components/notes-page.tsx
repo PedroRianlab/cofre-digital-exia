@@ -86,6 +86,7 @@ export function NotesPage({ onCreate, onEdit }: NotesPageProps) {
       toast.success("Nota excluída.");
     } catch (error) {
       toast.error(getApiErrorMessage(error));
+      throw error;
     }
   }
 
