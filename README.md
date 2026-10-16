@@ -298,6 +298,14 @@ simples dentro do prazo; em produção, seria avaliado o uso de cookies
 O logout atual remove o JWT no frontend. Como o backend é stateless e não mantém
 uma lista de revogação, um token já emitido permanece válido até expirar.
 
+### Alertas de dependências
+
+Em 15/10/2026, a auditoria de produção indicou 0 vulnerabilidades no frontend e
+2 alertas moderados no `js-yaml`, dependência do `@nestjs/swagger`. A API não lê
+YAML externo, portanto não há exposição prática; a atualização major ficou como
+próximo passo. Os demais alertas estão em ferramentas de desenvolvimento. Não
+usar `npm audit fix --force`, pois ele pode aplicar versões incompatíveis.
+
 ## Testes e qualidade
 
 Com o PostgreSQL iniciado e as migrations aplicadas:
